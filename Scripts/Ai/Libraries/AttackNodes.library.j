@@ -8,6 +8,7 @@ library AttackNodes requires DataStructures, UnitSelector, Math, Return
         private integer rectsCount = 0
         public boolean wantDestroy = true
         private rect composite = null
+        private rect groupMeet = null
         private integer compositeLastCalculated = 0
         public Node nextLink = 0
 
@@ -18,6 +19,42 @@ library AttackNodes requires DataStructures, UnitSelector, Math, Return
         public method addRect takes rect r returns nothing
             set rects[rectsCount] = r 
             set rectsCount = rectsCount + 1
+        endmethod
+
+        public method shouldGroupMeet takes nothing returns boolean
+            return not(groupMeet == null)
+        endmethod
+
+        public method setGroupMeet takes rect r returns nothing
+            set groupMeet = r
+        endmethod
+
+        public method getGroupMeetX takes nothing returns real
+            return GetRectCenterX(groupMeet)
+        endmethod
+
+        public method getGroupMeetY takes nothing returns real
+            return GetRectCenterY(groupMeet)
+        endmethod
+
+        public method isGroupReady takes DataStructures_UnitSet unitSet returns boolean
+            local integer i = 0
+            local integer loopEnd = unitSet.getCount()
+            local unit u
+
+            call unitSet.loopBegin()
+            loop
+                exitwhen unitSet.loopEnd()
+                set u = unitSet.loopGetNext()
+
+                if not(RectContainsUnit(groupMeet, u)) then
+                    set u = null
+                    return false
+                endif
+            endloop
+
+            set u = null
+            return true
         endmethod
 
         private method compositeNeedsCalculated takes nothing returns boolean
@@ -178,6 +215,10 @@ library AttackNodes requires DataStructures, UnitSelector, Math, Return
 
             if not(composite == null) then
                 call RemoveRect(composite)
+            endif
+
+            if not(groupMeet == null) then
+                call RemoveRect(groupMeet)
             endif
         endmethod
     endstruct
