@@ -219,6 +219,14 @@ public struct $Type$Set
         return handles[keys[0]]
     endmethod
 
+    public method random takes nothing returns $type$
+        if getCount() == 0 then
+            return null
+        endif
+
+        return handles[keys[GetRandomInt(0, getCount() - 1)]]
+    endmethod
+
     public method loopBegin takes nothing returns nothing
         set curLoopIndex = 0
     endmethod
